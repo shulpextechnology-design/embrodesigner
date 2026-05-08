@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { Mail, Lock, Eye, EyeOff, Sparkles, User, Store, ShoppingBag, Check } from "lucide-react";
+import { Mail, Lock, Eye, EyeOff, Sparkles, User, Store, ShoppingBag, Check, Phone } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,6 +20,7 @@ export default function RegisterPage() {
   const [formData, setFormData] = React.useState({
     name: "",
     email: "",
+    phone: "",
     password: "",
     role: "buyer" as "buyer" | "seller" | "both",
   });
@@ -38,6 +39,7 @@ export default function RegisterPage() {
         uid: user.uid,
         name: formData.name,
         email: formData.email,
+        phone: formData.phone,
         role: formData.role === "seller" ? "DESIGNER" : formData.role === "both" ? "DESIGNER" : "BUYER",
         createdAt: new Date().toISOString(),
       });
@@ -158,6 +160,15 @@ export default function RegisterPage() {
               value={formData.email}
               onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               leftIcon={<Mail className="h-5 w-5" />}
+              required
+            />
+            <Input
+              label="Mobile Number"
+              type="tel"
+              placeholder="+1 (555) 000-0000"
+              value={formData.phone}
+              onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+              leftIcon={<Phone className="h-5 w-5" />}
               required
             />
             <div className="relative">
