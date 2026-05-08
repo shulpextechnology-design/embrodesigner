@@ -56,7 +56,7 @@ function BrowseContent() {
     <div className="min-h-screen bg-white">
       {/* Header */}
       <div className="border-b border-[#d9d9d9] bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-6">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
           <h1 className="text-xl font-bold text-[#333333]">
             {categoryParam ? categories.find((c) => c.id === categoryParam)?.name || "Browse" : "Browse All Designs"}
           </h1>
@@ -64,7 +64,7 @@ function BrowseContent() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-6">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
         {/* Search & Sort */}
         <div className="mb-6 flex flex-col gap-4 sm:flex-row sm:items-center">
           <div className="relative flex-1">

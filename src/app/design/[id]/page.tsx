@@ -46,7 +46,7 @@ export default function DesignDetailPage() {
     <div className="min-h-screen bg-white">
       {/* Breadcrumb */}
       <div className="border-b border-[#d9d9d9] bg-white">
-        <div className="mx-auto max-w-7xl px-4 py-3">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-3">
           <nav className="flex items-center gap-2 text-xs text-[#666666]">
             <Link href="/" className="hover:text-[#d23368]">Home</Link>
             <span>/</span>
@@ -61,7 +61,7 @@ export default function DesignDetailPage() {
         </div>
       </div>
 
-      <div className="mx-auto max-w-7xl px-4 py-8">
+      <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-8">
         <div className="grid gap-8 lg:grid-cols-2">
           {/* Left - Images */}
           <div className="space-y-4">
