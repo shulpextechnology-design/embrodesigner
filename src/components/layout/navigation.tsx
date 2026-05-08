@@ -1,40 +1,98 @@
+"use client";
+
+import Link from "next/link";
+import { useCartStore } from "@/store/store";
+import { useAuthStore } from "@/components/auth-provider";
+import { LogOut, User, LayoutDashboard, ShieldCheck, ShoppingCart, Search, Menu } from "lucide-react";
+import { auth } from "@/lib/firebase";
+import { signOut } from "firebase/auth";
+import { useRouter } from "next/navigation";
+
 export function Navigation() {
-  const cartCount = 2;
+  const { items } = useCartStore();
+  const { user, role } = useAuthStore();
+  const router = useRouter();
+
+  const cartCount = items.length;
+
+  const handleLogout = async () => {
+    try {
+      await signOut(auth);
+      router.push("/");
+    } catch (error) {
+      console.error("Error signing out:", error);
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 bg-white border-b border-gray-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-orange-600 rounded-lg flex items-center justify-center">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-[#e94560] rounded-lg flex items-center justify-center">
               <span className="text-white font-bold">ED</span>
             </div>
             <div>
-              <h1 className="font-bold text-lg">Embro Designer</h1>
+              <h1 className="font-bold text-lg text-[#1a1a2e]">Embro Designer</h1>
               <p className="text-xs text-gray-500">Premium Designs</p>
             </div>
-          </div>
+          </Link>
 
           <nav className="hidden md:flex items-center gap-6">
-            <a href="/browse" className="text-sm font-medium text-gray-700 hover:text-orange-600">Browse</a>
-            <a href="/designers" className="text-sm font-medium text-gray-700 hover:text-orange-600">Designers</a>
-            <a href="/sale" className="text-sm font-medium text-gray-700 hover:text-orange-600">Sale</a>
+            <Link href="/browse" className="text-sm font-medium text-[#1a1a2e] hover:text-[#e94560] transition-colors">Browse</Link>
+            <Link href="/browse?category=floral" className="text-sm font-medium text-[#1a1a2e] hover:text-[#e94560] transition-colors">Floral</Link>
+            <Link href="/browse?category=monogram" className="text-sm font-medium text-[#1a1a2e] hover:text-[#e94560] transition-colors">Monograms</Link>
           </nav>
 
           <div className="flex items-center gap-4 sm:gap-6">
-            <div className="relative hidden sm:block">
-              <svg className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <input type="text" placeholder="Search designs..." className="w-full sm:w-48 lg:w-64 h-9 pl-10 pr-4 text-sm border border-gray-300 rounded-full bg-gray-50 focus:outline-none focus:border-orange-500" />
+            <div className="relative hidden lg:block">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+              <input type="text" placeholder="Search designs..." className="w-64 h-9 pl-10 pr-4 text-sm border border-gray-300 rounded-full bg-gray-50 focus:outline-none focus:border-[#e94560]" />
             </div>
-            <button className="flex-shrink-0 text-gray-600 hover:text-orange-600 transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-            </button>
-            <button className="relative flex-shrink-0 text-gray-600 hover:text-orange-600 transition-colors">
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-              {cartCount > 0 && <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-orange-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center border border-white">{cartCount}</span>}
-            </button>
+
+            <Link href="/checkout" className="relative flex-shrink-0 text-gray-600 hover:text-[#e94560] transition-colors">
+              <ShoppingCart className="w-5 h-5" />
+              {cartCount > 0 && (
+                <span className="absolute -top-1.5 -right-1.5 w-4 h-4 bg-[#e94560] text-white text-[10px] font-bold rounded-full flex items-center justify-center border border-white">
+                  {cartCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Auth specific links */}
+            {user ? (
+              <div className="flex items-center gap-4 border-l border-gray-200 pl-4 sm:pl-6">
+                {role === "ADMIN" && (
+                  <Link href="/admin/dashboard" className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-[#e94560] hover:text-[#ff6b6b] transition-colors">
+                    <ShieldCheck className="w-4 h-4" />
+                    Admin
+                  </Link>
+                )}
+                {role === "DESIGNER" && (
+                  <Link href="/designer/dashboard" className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-[#00a79d] hover:text-[#00c2b6] transition-colors">
+                    <LayoutDashboard className="w-4 h-4" />
+                    Portal
+                  </Link>
+                )}
+                <button 
+                  onClick={handleLogout}
+                  className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-red-500 transition-colors"
+                  title="Logout"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span className="hidden sm:inline">Logout</span>
+                </button>
+              </div>
+            ) : (
+              <div className="flex items-center gap-4 border-l border-gray-200 pl-4 sm:pl-6">
+                <Link href="/auth/login" className="text-sm font-medium text-[#1a1a2e] hover:text-[#e94560] transition-colors">
+                  Login
+                </Link>
+                <Link href="/auth/register" className="hidden sm:flex items-center justify-center rounded-full bg-[#e94560] px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-[#ff6b6b]">
+                  Sign Up
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </div>
