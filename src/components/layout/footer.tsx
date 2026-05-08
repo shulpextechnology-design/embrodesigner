@@ -51,7 +51,7 @@ export function Footer() {
           </div>
         </div>
 
-        <div style={{ borderTop: "1px solid #333", paddingTop: "24px", display: "flex", flexDirection: "column md:flex-row", justifyContent: "space-between", alignItems: "center", gap: "16px" }}>
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4" style={{ borderTop: "1px solid #333", paddingTop: "24px" }}>
           <p style={{ fontSize: "12px", color: "#6b6b6b" }}>© 2024 StitchVault. All rights reserved.</p>
           <div style={{ display: "flex", gap: "12px", fontSize: "12px", color: "#6b6b6b" }}>
             <Link href="#" style={{ color: "#6b6b6b" }}>Privacy</Link>

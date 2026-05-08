@@ -16,7 +16,7 @@ const sortOptions = [
   { value: "price-high", label: "Price: High to Low" },
 ];
 
-export default function BrowsePage() {
+function BrowseContent() {
   const searchParams = useSearchParams();
   const [searchQuery, setSearchQuery] = React.useState("");
   const [sortBy, setSortBy] = React.useState("relevance");
@@ -153,5 +153,13 @@ export default function BrowsePage() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function BrowsePage() {
+  return (
+    <React.Suspense fallback={<div className="flex min-h-screen items-center justify-center">Loading...</div>}>
+      <BrowseContent />
+    </React.Suspense>
   );
 }
