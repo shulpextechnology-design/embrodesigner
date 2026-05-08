@@ -5,11 +5,11 @@ import { Upload, X, Image as ImageIcon, File as FileIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/components/auth-provider";
-import { db, storage } from "@/lib/firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { db } from "@/lib/firebase";
 import { collection, addDoc, serverTimestamp } from "firebase/firestore";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { uploadFiles } from "@/lib/uploadthing";
 
 const categories = [
   { id: "floral", name: "Floral & Botanical" },
@@ -56,15 +56,17 @@ export default function UploadDesignPage() {
     setError(null);
 
     try {
-      // 1. Upload Thumbnail
-      const thumbRef = ref(storage, `thumbnails/${user.uid}/${Date.now()}_${thumbnailFile.name}`);
-      await uploadBytes(thumbRef, thumbnailFile);
-      const thumbnailUrl = await getDownloadURL(thumbRef);
+      // 1. Upload Thumbnail via UploadThing
+      const thumbResponse = await uploadFiles("thumbnailUploader", {
+        files: [thumbnailFile],
+      });
+      const thumbnailUrl = thumbResponse[0].url;
 
-      // 2. Upload Design File
-      const designRef = ref(storage, `designs/${user.uid}/${Date.now()}_${designFile.name}`);
-      await uploadBytes(designRef, designFile);
-      const designUrl = await getDownloadURL(designRef);
+      // 2. Upload Design File via UploadThing
+      const designResponse = await uploadFiles("designUploader", {
+        files: [designFile],
+      });
+      const designUrl = designResponse[0].url;
 
       // 3. Save to Firestore
       const tagsArray = formData.tags.split(",").map(tag => tag.trim()).filter(Boolean);
@@ -87,7 +89,7 @@ export default function UploadDesignPage() {
       router.push("/designer/designs");
     } catch (err: any) {
       console.error(err);
-      setError(err.message || "Failed to upload design. Check your Firebase Storage rules.");
+      setError(err.message || "Failed to upload design to UploadThing.");
     } finally {
       setIsLoading(false);
     }
