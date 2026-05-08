@@ -74,6 +74,10 @@ export function Navigation() {
                     Portal
                   </Link>
                 )}
+                <Link href="/buyer/dashboard" className="hidden sm:flex items-center gap-1.5 text-sm font-medium text-[#1a1a2e] hover:text-[#e94560] transition-colors">
+                  <User className="w-4 h-4" />
+                  My Purchases
+                </Link>
                 <button 
                   onClick={handleLogout}
                   className="flex items-center gap-1.5 text-sm font-medium text-gray-600 hover:text-red-500 transition-colors"

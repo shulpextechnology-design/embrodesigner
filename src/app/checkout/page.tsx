@@ -46,6 +46,8 @@ export default function CheckoutPage() {
           designId: item.design.id,
           title: item.design.title,
           price: item.design.salePrice || item.design.price,
+          designUrl: item.design.designUrl || null,
+          thumbnailUrl: item.design.thumbnailUrl || item.design.thumbnail || null,
         })),
         subtotal,
         tax,
