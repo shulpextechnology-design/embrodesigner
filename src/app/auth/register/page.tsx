@@ -7,9 +7,16 @@ import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+import { useRouter } from "next/navigation";
+import { auth, db } from "@/lib/firebase";
+import { createUserWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { doc, setDoc } from "firebase/firestore";
+
 export default function RegisterPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
   const [formData, setFormData] = React.useState({
     name: "",
     email: "",
@@ -20,8 +27,28 @@ export default function RegisterPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
+    setError(null);
+    try {
+      const userCredential = await createUserWithEmailAndPassword(auth, formData.email, formData.password);
+      const user = userCredential.user;
+      
+      await updateProfile(user, { displayName: formData.name });
+      
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        name: formData.name,
+        email: formData.email,
+        role: formData.role === "seller" ? "DESIGNER" : formData.role === "both" ? "DESIGNER" : "BUYER",
+        createdAt: new Date().toISOString(),
+      });
+      
+      router.push("/");
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || "Failed to create account. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const roles = [
@@ -111,6 +138,11 @@ export default function RegisterPage() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-500 border border-red-100">
+                {error}
+              </div>
+            )}
             <Input
               label="Full Name"
               placeholder="John Doe"

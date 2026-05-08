@@ -3,7 +3,7 @@ import "./globals.css";
 import { Navigation } from "@/components/layout/navigation";
 import { Footer } from "@/components/layout/footer";
 import { CartSidebar } from "@/components/layout/cart-sidebar";
-
+import { AuthProvider } from "@/components/auth-provider";
 export const metadata: Metadata = {
   title: "Embro Designer - Premium Embroidery Design Marketplace",
   description: "Discover thousands of premium embroidery designs from talented creators worldwide. Shop floral, geometric, monogram, and custom designs for machine embroidery.",
@@ -35,10 +35,12 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen flex flex-col antialiased bg-[#faf9f7]">
-        <Navigation />
-        <main className="flex-1">{children}</main>
-        <Footer />
-        <CartSidebar />
+        <AuthProvider>
+          <Navigation />
+          <main className="flex-1">{children}</main>
+          <Footer />
+          <CartSidebar />
+        </AuthProvider>
       </body>
     </html>
   );

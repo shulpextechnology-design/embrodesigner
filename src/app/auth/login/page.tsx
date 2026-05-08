@@ -6,9 +6,15 @@ import { Mail, Lock, Eye, EyeOff, Sparkles } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+import { useRouter } from "next/navigation";
+import { auth } from "@/lib/firebase";
+import { signInWithEmailAndPassword } from "firebase/auth";
+
 export default function LoginPage() {
+  const router = useRouter();
   const [showPassword, setShowPassword] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
+  const [error, setError] = React.useState<string | null>(null);
   const [formData, setFormData] = React.useState({
     email: "",
     password: "",
@@ -17,8 +23,16 @@ export default function LoginPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsLoading(false);
+    setError(null);
+    try {
+      await signInWithEmailAndPassword(auth, formData.email, formData.password);
+      router.push("/");
+    } catch (err: any) {
+      console.error(err);
+      setError("Invalid email or password. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -71,6 +85,11 @@ export default function LoginPage() {
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
+            {error && (
+              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-500 border border-red-100">
+                {error}
+              </div>
+            )}
             <Input
               label="Email"
               type="email"
