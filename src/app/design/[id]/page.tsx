@@ -8,18 +8,82 @@ import { Heart, ShoppingCart, Star, Download, Share2, ChevronLeft, ChevronRight,
 import { cn, formatPrice } from "@/lib/utils";
 import { useCartStore, useFavoritesStore } from "@/store/store";
 import { getDesignById, getDesignerById, designs as allDesigns } from "@/data/designs";
+import { db } from "@/lib/firebase";
+import { doc, getDoc } from "firebase/firestore";
 
 export default function DesignDetailPage() {
   const params = useParams();
-  const design = getDesignById(params.id as string);
-  const designer = design ? getDesignerById(design.designerId) : null;
-  const [selectedImage, setSelectedImage] = React.useState(0);
   const { addItem } = useCartStore();
   const { isFavorite, toggleFavorite } = useFavoritesStore();
+  
+  const [design, setDesign] = React.useState<any>(null);
+  const [designer, setDesigner] = React.useState<any>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+  const [selectedImage, setSelectedImage] = React.useState(0);
+
+  React.useEffect(() => {
+    async function fetchDesign() {
+      setIsLoading(true);
+      const id = params.id as string;
+      
+      // Try static first
+      const staticDesign = getDesignById(id);
+      if (staticDesign) {
+        setDesign(staticDesign);
+        setDesigner(getDesignerById(staticDesign.designerId));
+        setIsLoading(false);
+        return;
+      }
+
+      // Try Firestore
+      try {
+        const docRef = doc(db, "designs", id);
+        const docSnap = await getDoc(docRef);
+        if (docSnap.exists()) {
+          const data = docSnap.data();
+          setDesign({
+            id: docSnap.id,
+            ...data,
+            thumbnail: data.thumbnailUrl || "https://placehold.co/400x400?text=No+Image",
+            previewImages: [data.thumbnailUrl || "https://placehold.co/400x400?text=No+Image"],
+            formats: data.formats || ["ZIP", "PES", "DST"],
+            stitchCount: data.stitchCount || 15000,
+            width: data.width || 4.5,
+            height: data.height || 4.5,
+            colors: data.colors || 4,
+            difficulty: data.difficulty || "Beginner",
+          });
+          
+          // Try to fetch designer info
+          if (data.designerId) {
+            const designerDoc = await getDoc(doc(db, "users", data.designerId));
+            if (designerDoc.exists()) {
+              setDesigner({
+                id: designerDoc.id,
+                name: designerDoc.data().name,
+                shopName: designerDoc.data().shopName || `${designerDoc.data().name}'s Shop`,
+                avatar: designerDoc.data().avatar || "https://placehold.co/100x100?text=Avatar",
+                totalSales: designerDoc.data().sales || 0,
+              });
+            }
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching design:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    fetchDesign();
+  }, [params.id]);
 
   const relatedDesigns = allDesigns
     .filter((d) => d.category === design?.category && d.id !== design?.id)
     .slice(0, 4);
+
+  if (isLoading) {
+    return <div className="flex min-h-screen items-center justify-center">Loading design...</div>;
+  }
 
   if (!design) {
     return (
