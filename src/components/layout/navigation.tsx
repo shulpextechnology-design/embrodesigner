@@ -10,7 +10,7 @@ export function Navigation() {
               <span className="text-white font-bold">ED</span>
             </div>
             <div>
-              <h1 className="font-bold text-lg">StitchVault</h1>
+              <h1 className="font-bold text-lg">Embro Designer</h1>
               <p className="text-xs text-gray-500">Premium Designs</p>
             </div>
           </div>

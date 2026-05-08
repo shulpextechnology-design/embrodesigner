@@ -10,7 +10,7 @@ export function Footer() {
               <div style={{ width: "40px", height: "40px", backgroundColor: "#c2410c", borderRadius: "12px", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <span style={{ color: "white", fontWeight: 700, fontSize: "14px" }}>ED</span>
               </div>
-              <span style={{ fontSize: "18px", fontWeight: 700, color: "white" }}>StitchVault</span>
+              <span style={{ fontSize: "18px", fontWeight: 700, color: "white" }}>Embro Designer</span>
             </Link>
             <p style={{ fontSize: "14px", color: "#6b6b6b", lineHeight: 1.6 }}>
               Where thread meets art. Premium embroidery designs for every creative vision.
@@ -52,7 +52,7 @@ export function Footer() {
         </div>
 
         <div className="flex flex-col md:flex-row justify-between items-center gap-4" style={{ borderTop: "1px solid #333", paddingTop: "24px" }}>
-          <p style={{ fontSize: "12px", color: "#6b6b6b" }}>© 2024 StitchVault. All rights reserved.</p>
+          <p style={{ fontSize: "12px", color: "#6b6b6b" }}>© 2024 Embro Designer. All rights reserved.</p>
           <div style={{ display: "flex", gap: "12px", fontSize: "12px", color: "#6b6b6b" }}>
             <Link href="#" style={{ color: "#6b6b6b" }}>Privacy</Link>
             <span>•</span>
