@@ -8,7 +8,9 @@ import { formatPrice } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useCartStore } from "@/store/store";
-
+import { useAuthStore } from "@/components/auth-provider";
+import { db } from "@/lib/firebase";
+import { collection, addDoc, serverTimestamp, doc, updateDoc, increment } from "firebase/firestore";
 export default function CheckoutPage() {
   const { items, getTotalPrice, clearCart } = useCartStore();
   const [isProcessing, setIsProcessing] = React.useState(false);
@@ -25,13 +27,57 @@ export default function CheckoutPage() {
   const tax = subtotal * 0.0;
   const total = subtotal + tax;
 
+  const { user } = useAuthStore();
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsProcessing(true);
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setIsProcessing(false);
-    setIsComplete(true);
-    clearCart();
+    
+    try {
+      // 1. Simulate payment processing
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      
+      // 2. Record the order in Firestore
+      const orderData = {
+        userId: user?.uid || "guest",
+        customerEmail: formData.email,
+        customerName: formData.name,
+        items: items.map(item => ({
+          designId: item.design.id,
+          title: item.design.title,
+          price: item.design.salePrice || item.design.price,
+        })),
+        subtotal,
+        tax,
+        total,
+        status: "completed",
+        createdAt: serverTimestamp()
+      };
+      
+      const orderRef = await addDoc(collection(db, "orders"), orderData);
+
+      // 3. Increment sales counts for the designs (if they are Firestore designs)
+      for (const item of items) {
+        try {
+          if (item.design.id.length > 10) { // Simple check for Firestore UUID vs static 'd1'
+            const designRef = doc(db, "designs", item.design.id);
+            await updateDoc(designRef, {
+              sales: increment(1)
+            });
+          }
+        } catch (e) {
+          console.log("Static design, skipping sales increment");
+        }
+      }
+
+      setIsComplete(true);
+      clearCart();
+    } catch (error) {
+      console.error("Checkout failed:", error);
+      alert("Payment failed. Please try again.");
+    } finally {
+      setIsProcessing(false);
+    }
   };
 
   if (isComplete) {
@@ -192,7 +238,7 @@ export default function CheckoutPage() {
                   <div key={item.design.id} className="flex gap-4">
                     <div className="relative h-20 w-20 flex-shrink-0 overflow-hidden rounded-lg bg-[#f8f9fc]">
                       <Image
-                        src={item.design.thumbnail}
+                        src={item.design.thumbnail || item.design.thumbnailUrl || "https://placehold.co/100x100"}
                         alt={item.design.title}
                         fill
                         className="object-cover"
@@ -203,7 +249,7 @@ export default function CheckoutPage() {
                         {item.design.title}
                       </p>
                       <p className="mt-1 text-xs text-[#94a3b8]">
-                        {item.design.formats.slice(0, 2).join(", ")}
+                        {item.design.formats?.slice(0, 2).join(", ") || "ZIP"}
                       </p>
                       <p className="mt-1 text-sm font-semibold text-[#e94560]">
                         {formatPrice(item.design.salePrice || item.design.price)}
