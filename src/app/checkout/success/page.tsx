@@ -68,10 +68,17 @@ export default function CheckoutSuccessPage() {
                     <p className="text-xs text-[#64748b]">ZIP File (PES, DST, EXP)</p>
                   </div>
                 </div>
-                {/* In a real app, this would be a secure download signed URL. */}
-                <Button variant="outline" size="sm" className="gap-2">
-                  <Download className="h-4 w-4" /> Download
-                </Button>
+                {item.designUrl ? (
+                  <a href={item.designUrl} download target="_blank" rel="noopener noreferrer">
+                    <Button variant="outline" size="sm" className="gap-2">
+                      <Download className="h-4 w-4" /> Download
+                    </Button>
+                  </a>
+                ) : (
+                  <Button variant="outline" size="sm" className="gap-2">
+                    <Download className="h-4 w-4" /> Download
+                  </Button>
+                )}
               </div>
             ))}
           </div>
